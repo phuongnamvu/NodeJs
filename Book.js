@@ -51,6 +51,46 @@ var app=http.createServer((request,response)=>{
     // urlObject = url.parse(request.url);
     // console.log("Parsed Url Object", urlObject);
 
+    // DELETE BOOK
+    if (request.method == "DELETE") {
+        if (request.url == "/booker-Delete") {
+            // data as part of body section
+            // server ; request stream-- read stream
+            var fullData = "";
+            request.on("data", (chunk) => {
+                fullData += chunk.toString();
+            })
+            request.on("end", () => {
+                // var empToBeDeleted = JSON.parse(fullData);
+                var bookToBeDeleted = JSON.parse(fullData);
+                var pos = empArr.findIndex(item => item.bookId == bookToBeDeleted.bookId);
+
+                if (pos >= 0) {
+                    // bookId already exists; Deleted was successful
+                    empArr.splice(pos,1);
+                    empArr.push(bookToBeDeleted);
+                    response.end(JSON.stringify(empArr));
+                }
+                else {
+                    // bookId does not exists;
+                    // empArr.push(empToBeInserted);
+                    
+
+                    response.end("bookId already exists. Deletetion could not be done");
+                }
+            })
+            request.on("error", (err) => {
+                response.statusCode = 401;
+                response.end(`Error : ${err}`);
+            })
+        }
+        else
+        {
+            response.end("Post request not allowed for this url")
+        }
+    }else
+
+
     // ADD BOOK    
     
     if (request.method == "POST") {
@@ -61,20 +101,10 @@ var app=http.createServer((request,response)=>{
             request.on("data", (chunk) => {
                 fullData += chunk.toString();
             })
-
-            // Fix 
             request.on("end", () => {
                 var empToBeInserted = JSON.parse(fullData);
                 var bookToBeInserted = JSON.parse(fullData);
                 var pos = empArr.findIndex(item => item.bookId == empToBeInserted.bookId);
-
-            //  Solution 
-                // var obj;
-                // fs.readFile('books.json', 'utf8', function (err, data) {
-                //      if (err) throw err;
-                //      obj = JSON.parse(data);
-                //      var pos = obj.findIndex(item => item.bookId == bookToBeInserted.bookId);
-                //      console.log(pos);  
 
                 if (pos >= 0) {
                     // bookId already exists; inform the client; Insert was not successful
@@ -86,7 +116,6 @@ var app=http.createServer((request,response)=>{
                     empArr.push(bookToBeInserted);
                     response.end(JSON.stringify(empArr));
                 }
-
             })
             request.on("error", (err) => {
                 response.statusCode = 401;
