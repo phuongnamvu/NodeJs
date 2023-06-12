@@ -51,6 +51,45 @@ var app=http.createServer((request,response)=>{
     // urlObject = url.parse(request.url);
     // console.log("Parsed Url Object", urlObject);
 
+    // PUT BOOK - RENAME 
+    if (request.method == "PUT") {
+        if (request.url == "/booker-Rename") {
+            // data as part of body section
+            // server ; request stream-- read stream
+            var fullData = "";
+            request.on("data", (chunk) => {
+                fullData += chunk.toString();
+            })
+            request.on("end", () => {
+                // var empToBeDeleted = JSON.parse(fullData);
+                var bookToBeRename = JSON.parse(fullData);
+                var pos = empArr.findIndex(item => item.bookId == bookToBeRename.bookId);
+
+                if (pos >= 0) {
+                    // bookId already exists; Deleted was successful
+                    empArr[pos]=bookToBeRename;
+                    empArr.push(bookToBeRename);
+                    response.end(JSON.stringify(empArr));
+                }
+                else {
+                    // bookId does not exists;
+                    // empArr.push(empToBeInserted);
+                    
+
+                    response.end("bookId already exists. Deletetion could not be done");
+                }
+            })
+            request.on("error", (err) => {
+                response.statusCode = 401;
+                response.end(`Error : ${err}`);
+            })
+        }
+        else
+        {
+            response.end("Post request not allowed for this url")
+        }
+    }else
+    
     // DELETE BOOK
     if (request.method == "DELETE") {
         if (request.url == "/booker-Delete") {
