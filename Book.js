@@ -107,6 +107,11 @@ var app=http.createServer((request,response)=>{
                 if (pos >= 0) {
                     // bookId already exists; Deleted was successful
                     empArr.splice(pos,1);
+
+                    //  Read && Write :Json Book file
+                    //  Add Here 
+
+                    // Write to empArr Var 
                     empArr.push(bookToBeDeleted);
                     response.end(JSON.stringify(empArr));
                 }
@@ -130,6 +135,33 @@ var app=http.createServer((request,response)=>{
     }else
 
 
+    // Read & Write : Json file
+
+    var obj;
+                    fs.readFile('books.json', 'utf8', function (err, data) {
+                         if (err) throw err;
+                         obj = JSON.parse(data);
+                         var pos = obj.findIndex(item => item.bookId == empToBeDeleted.bookId);
+                         console.log(pos);
+                         if (pos >= 0) {
+                              obj.splice(pos, 1);
+                              
+                              fs.writeFile("books.json", JSON.stringify(obj, null, 2), (err) => {
+                                   if (err) {
+                                       console.log(`Error during the write operation : ${err}`);
+                                   }
+                                   else {
+                                       console.log("Write into the file is successful");
+                                       response.end(JSON.stringify(obj));
+                                   }
+                               })
+                             
+                         }
+                         else {
+                              response.end("Book Id not exists.");
+                         }
+
+                        })
     // ADD BOOK    
     
     if (request.method == "POST") {
